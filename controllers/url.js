@@ -19,7 +19,9 @@ async function handleGenNewShortURL(req, res){
         visitHistory: [],
     });
 
-    return res.json({id: shortId});
+    return res.render("home",{
+        id:shortId
+    });
 }
 
 // Function to get analytics for a shortID of URL
