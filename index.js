@@ -1,15 +1,17 @@
 const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser')
+const {restrictToLoggedInUserOnly,checkAuth} = require('./middlewares/auth')
 
 //Routers for routes
 const urlRoute = require('./routes/url');
 const staticRoute = require('./routes/staticRouter');
+const userRoute = require('./routes/user');
 
 const {connectToMongoDB} = require('./connect');
 
 //Models
 const URL = require('./models/url');
-
-const path = require('path');
 
 const app = express();
 const PORT = 8001;
@@ -27,18 +29,13 @@ app.set('views',path.resolve('./views'));
 app.use(express.json());
 // To support form data
 app.use(express.urlencoded({extended:false}));
+// To support cookies
+app.use(cookieParser())
 
-// Setting routes
-app.use("/url", urlRoute);
-app.use("/",staticRoute);
-
-// Testing UI
-app.get('/test', async (req,res) =>{
-    const allUrls = await URL.find({});
-    return res.render('home',{
-        urls: allUrls
-    })
-});
+// Routes
+app.use("/",checkAuth, staticRoute);
+app.use("/url",restrictToLoggedInUserOnly, urlRoute);
+app.use("/user",userRoute);
 
 
 //Temporary : Fetch from db and increment
