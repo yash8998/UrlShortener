@@ -24,10 +24,9 @@ async function handleUserLogin(req,res){
             error: "Invalid username or password"
     });
 
-    // Map a session id for the user and return as a cookie
-    const sessionid = uuidv4()
-    setUser(sessionid,user)
-    res.cookie("uid",sessionid)
+    // Generate a JWT for a user and send it via cookie
+    const token = setUser(user)
+    res.cookie("uid",token)
     
     return res.redirect("/")
 }
